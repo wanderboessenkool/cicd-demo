@@ -10,9 +10,9 @@ openshift.withCluster() {
       }
       stages {
         stage('create') {
-          sh env
-          //def model = openshift.process(templateName, "-p", "SOURCE_REPOSITORY_URL=$GIT_URL")
-          //openshift.newApp(templateName)
+          def scmUrl = scm.getUserRemoteConfigs()[0].getUrl()
+          def model = openshift.process(templateName, "-p", "SOURCE_REPOSITORY_URL=$scmUrl", "-", "CONTEXT_DIR=html")
+          openshift.newApp(model)
         }
         stage ('build') {
           steps {
