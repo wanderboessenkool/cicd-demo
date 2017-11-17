@@ -6,7 +6,7 @@ node('maven') {
     openshiftDeploy(deploymentConfig: 'httpd-example', namespace: 'development')
   }
 }
-stage('apprval') {
+stage('approval') {
   input('Proceed with deploy to testing?')
 }
 node('maven') {
