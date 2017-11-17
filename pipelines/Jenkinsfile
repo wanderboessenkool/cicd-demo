@@ -5,6 +5,9 @@ node('maven') {
   stage ('deploy') {
     openshiftDeploy(deploymentConfig: 'httpd-example', namespace: 'development')
   }
+}
+input('Proceed with deploy to testing?')
+node('maven') {
   stage ('tag') {
     openshiftTag(namespace: 'development', sourceStream: 'httpd-example', sourceTag: 'latest', destinationNamespace: 'testing', destinationStream: 'httpd-example', destinationTag: 'latest')
   }
