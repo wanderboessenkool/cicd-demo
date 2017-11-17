@@ -6,7 +6,7 @@ node('maven') {
     openshiftDeploy(deploymentConfig: 'httpd-example', namespace: 'development')
   }
   stage ('test') {
-    printenv
-    sh "curl http://httpd-example-development.apps.example.com"
+    echo sh(returnStdout: true, script: 'env')
+    echo sh ("curl http://httpd-example-development.apps.example.com")
   }
 }
