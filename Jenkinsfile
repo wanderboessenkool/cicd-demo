@@ -1,5 +1,4 @@
-def templatePath = 'templates/httpd-template.json'
-def templateName = 'httpd-example'
+def templateName = 'openshift/httpd-example'
 openshift.withCluster() {
   openshift.withProject() {
     echo "Using project: ${openshift.project()}"
@@ -11,6 +10,8 @@ openshift.withCluster() {
       }
       stages {
         stage('create') {
+          sh env
+          def model = openshift.process(templateName, "-p", "SOURCE_REPOSITORY_URL=$GIT_URL)"
           openshift.newApp(templateName)
         }
         stage ('build') {
