@@ -1,10 +1,10 @@
 node('maven') {
-  stage 'build' {
+  stage 'build' 
     openshiftBuild(buildConfig: 'httpd-example', showBuildLogs: 'true', namespace: 'development')
-  }
-  stage 'deploy' {
+  
+  stage 'deploy' 
     openshiftDeploy(deploymentConfig: 'httpd-example', namespace: 'development')
-  }
+  
   stage 'test' {
     printenv
     sh "curl http://httpd-example-development.apps.example.com"
