@@ -2,15 +2,15 @@
   "kind": "Template",
   "apiVersion": "v1",
   "metadata": {
-    "name": "nodejs-example",
+    "name": "httpd-example",
     "annotations": {
       "openshift.io/display-name": "httpd",
-      "description": "An example httpd application with no database. For more information about using this template, including OpenShift considerations, see https://github.com/openshift/nodejs-ex/blob/master/README.md.",
+      "description": "An example httpd application with no database. For more information about using this template, including OpenShift considerations, see https://github.com/openshift/httpd-ex/blob/master/README.md.",
       "tags": "quickstart,httpd",
-      "iconClass": "icon-nodejs"
+      "iconClass": "icon-httpd"
     }
   },
-  "message": "The following service(s) have been created in your project: ${NAME}.\n\nFor more information about using this template, including OpenShift considerations, see https://github.com/openshift/nodejs-ex/blob/master/README.md.",
+  "message": "The following service(s) have been created in your project: ${NAME}.\n\nFor more information about using this template, including OpenShift considerations, see https://github.com/openshift/httpd-ex/blob/master/README.md.",
   "labels": {
     "template": "httpd-example"
   },
@@ -85,7 +85,7 @@
             "from": {
               "kind": "ImageStreamTag",
               "namespace": "${NAMESPACE}",
-              "name": "nodejs:4"
+              "name": "httpd:4"
             },
             "env":  [
               {
@@ -209,7 +209,7 @@
       "displayName": "Name",
       "description": "The name assigned to all of the frontend objects defined in this template.",
       "required": true,
-      "value": "nodejs-example"
+      "value": "httpd-example"
     },
     {
       "name": "NAMESPACE",
@@ -230,7 +230,7 @@
       "displayName": "Git Repository URL",
       "description": "The URL of the repository with your application source code.",
       "required": true,
-      "value": "https://github.com/alezzandro/nodejs-ex.git"
+      "value": "https://github.com/alezzandro/httpd-ex.git"
     },
     {
       "name": "SOURCE_REPOSITORY_REF",
