@@ -7,6 +7,6 @@ node('maven') {
   }
   stage 'test' {
     printenv
-    sh curl http://httpd-example-development.apps.example.com    
+    sh "curl http://httpd-example-development.apps.example.com"
   }
 }
