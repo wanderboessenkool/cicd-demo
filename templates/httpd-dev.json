@@ -85,7 +85,7 @@
             "from": {
               "kind": "ImageStreamTag",
               "namespace": "${NAMESPACE}",
-              "name": "httpd:4"
+              "name": "httpd:latest"
             },
             "env":  [
               {
@@ -114,10 +114,7 @@
               "secret": "${GENERIC_WEBHOOK_SECRET}"
             }
           }
-        ],
-        "postCommit": {
-          "script": "npm test"
-        }
+        ]
       }
     },
     {
