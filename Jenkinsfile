@@ -11,7 +11,7 @@ openshift.withCluster() {
       }
       stages {
         stage('create') {
-          openshift.newApp(templatePath)
+          openshift.newApp(templateName)
         }
         stage ('build') {
           steps {
