@@ -9,7 +9,7 @@ node('maven') {
     openshiftTag(namespace: 'development', sourceStream: 'httpd-example', sourceTag: 'latest', destinationNamespace: 'testing', destinationStream: 'httpd-example', destinationTag: 'latest')
   }
   stage ('deploy') {
-    openshiftDeploy(deploymentconfig: 'httpd-example', namespace: 'testing')
+    openshiftDeploy(deploymentConfig: 'httpd-example', namespace: 'testing')
   }
 }
 
