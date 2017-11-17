@@ -11,7 +11,7 @@ openshift.withCluster() {
       stages {
         stage('create') {
           sh env
-          def model = openshift.process(templateName, "-p", "SOURCE_REPOSITORY_URL=$GIT_URL)"
+          def model = openshift.process(templateName, "-p", "SOURCE_REPOSITORY_URL=$GIT_URL")
           openshift.newApp(templateName)
         }
         stage ('build') {
