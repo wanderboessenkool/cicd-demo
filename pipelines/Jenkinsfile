@@ -1,20 +1,57 @@
+def createProject(project) {
+  try {
+    openshift.newProject(project)
+  } catch (e) {
+    echo ("Project ${project} exists, or other error: ${e}"}
+    echo ("Soldiering on anyway")
+  }
+}
+
+def createApp(app-template, project) {
+  try { 
+    openshift.newApp(app-template, namespace=project)
+  } catch (e) {
+    echo("Error, assuming app exists, using existing app")
+    echo("Error was: ${e}")
+    echo("Continuing anyway")
+  }
+}
+
 node('maven') {
   stage ('build') {
-    openshiftBuild(buildConfig: 'httpd-example', showBuildLogs: 'true', namespace: 'development')
+    createApp('templates/httpd-dev.json', openshift.project())
+    openshiftBuild(buildConfig: 'httpd-example', showBuildLogs: 'true')
   }
   stage ('deploy') {
-    openshiftDeploy(deploymentConfig: 'httpd-example', namespace: 'development')
+    openshiftDeploy(deploymentConfig: 'httpd-example')
   }
-}
-stage('approval') {
-  input('Proceed with deploy to testing?')
-}
-node('maven') {
-  stage ('tag') {
-    openshiftTag(namespace: 'development', sourceStream: 'httpd-example', sourceTag: 'latest', destinationNamespace: 'testing', destinationStream: 'httpd-example', destinationTag: 'latest')
-  }
-  stage ('deploy') {
+  stage('test') {
+    try {
+      openshift.newProject('testing')
+    } catch (e) {
+      echo ("Project testing exists, or other error: ${e}"}
+    }
+    createProject('testing')
+    createApp('templates/httpd-test.json', 'testing')
+    openshiftTag(namespace: openshift.project(), sourceStream: 'httpd-example', sourceTag: 'latest', destinationNamespace: 'testing', destinationStream: 'httpd-example', destinationTag: 'latest')
     openshiftDeploy(deploymentConfig: 'httpd-example', namespace: 'testing')
   }
 }
 
+stage('approval') {
+  input('Proceed with deploy to production?')
+}
+
+node('maven') {
+  stage ('Production') {
+    try {
+      openshift.newProject('testing')
+    } catch (e) {
+      echo ("Project testing exists, or other error: ${e}"}
+    }
+    createProject('production')
+    createApp('templates/httpd-test.json', 'production')
+    openshiftTag(namespace: 'testing', sourceStream: 'httpd-example', sourceTag: 'latest', destinationNamespace: 'production', destinationStream: 'httpd-example', destinationTag: 'latest')
+    openshiftDeploy(deploymentConfig: 'httpd-example', namespace: 'production')
+  }
+}
