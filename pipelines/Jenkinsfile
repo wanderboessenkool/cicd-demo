@@ -8,11 +8,9 @@ def createProject(project) {
 }
 
 def createApp(appTemplate, project) {
-  echo(sh("pwd; ls -l; ls -l .."))
-  echo(sh("env"))
   try {
     openshift.withProject(project) {
-      openshift.create(appTemplate)
+      openshift.create(openshift.process(appTemplate))
     }
   } catch (e) {
     echo("Error, assuming app exists, using existing app")
