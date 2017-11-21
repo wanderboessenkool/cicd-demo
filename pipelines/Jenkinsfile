@@ -13,7 +13,7 @@ def createProject(project) {
 def createApp(appTemplate, project) {
   try {
     openshift.withProject(project) {
-      openshift.create(openshift.process(appTemplate))
+      openshift.create(openshift.process(appTemplate, "-p NAMESPACE=${project}"))
     }
   } catch (e) {
     echo("Error, assuming app exists, using existing app")
