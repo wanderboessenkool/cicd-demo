@@ -1,5 +1,6 @@
 def createProject(project) {
   openshift.withCluster() {
+    echo("Attempting to create project on cluster: ${openshift.cluster()}")
     try {
       openshift.newProject(project, "--display-name", project)
     } catch (e) {
