@@ -12,7 +12,7 @@ def createApp(appTemplate, project) {
   echo(sh("env"))
   try {
     openshift.withProject(project) {
-      openshift.create(appTemplate, namespace=project)
+      openshift.create(appTemplate)
     }
   } catch (e) {
     echo("Error, assuming app exists, using existing app")
