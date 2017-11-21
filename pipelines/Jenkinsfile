@@ -23,7 +23,7 @@ def createApp(appTemplate, project) {
 
 node('maven') {
   stage ('build') {
-    createApp('templates/httpd-dev.json', 'cicd-demo')
+    createApp('https://raw.githubusercontent.com/wanderboessenkool/cicd-demo/master/templates/httpd-dev.json', 'cicd-demo')
     openshiftBuild(buildConfig: 'httpd-example', showBuildLogs: 'true')
   }
   stage ('deploy') {
@@ -36,7 +36,7 @@ node('maven') {
       echo ("Project testing exists, or other error: ${e}")
     }
     createProject('testing')
-    createApp('templates/httpd-test.json', 'testing')
+    createApp('https://raw.githubusercontent.com/wanderboessenkool/cicd-demo/master/templates/httpd-test.json', 'testing')
     openshiftTag(namespace: openshift.project(), sourceStream: 'httpd-example', sourceTag: 'latest', destinationNamespace: 'testing', destinationStream: 'httpd-example', destinationTag: 'latest')
     openshiftDeploy(deploymentConfig: 'httpd-example', namespace: 'testing')
   }
@@ -49,7 +49,7 @@ stage('approval') {
 node('maven') {
   stage ('Production') {
     createProject('production')
-    createApp('templates/httpd-test.json', 'production')
+    createApp('https://raw.githubusercontent.com/wanderboessenkool/cicd-demo/master/templates/httpd-test.json', 'production')
     openshiftTag(namespace: 'testing', sourceStream: 'httpd-example', sourceTag: 'latest', destinationNamespace: 'production', destinationStream: 'httpd-example', destinationTag: 'latest')
     openshiftDeploy(deploymentConfig: 'httpd-example', namespace: 'production')
   }
