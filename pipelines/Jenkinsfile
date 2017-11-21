@@ -8,6 +8,7 @@ def createProject(project) {
 }
 
 def createApp(appTemplate, project) {
+  echo(sh("pwd; ls -l"))
   try {
     openshift.withProject(project) {
       openshift.newApp(appTemplate, namespace=project)
