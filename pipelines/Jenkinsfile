@@ -1,9 +1,11 @@
 def createProject(project) {
-  try {
-    openshift.newProject(project)
-  } catch (e) {
-    echo ("Project ${project} exists, or other error: ${e}")
-    echo ("Soldiering on anyway")
+  openshift.withCluster() {
+    try {
+      openshift.newProject(project, "--display-name", project)
+    } catch (e) {
+      echo ("Project ${project} exists, or other error: ${e}")
+      echo ("Soldiering on anyway")
+    }
   }
 }
 
