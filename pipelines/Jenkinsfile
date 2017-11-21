@@ -29,7 +29,7 @@ node('maven') {
     try {
       openshift.newProject('testing')
     } catch (e) {
-      echo ("Project testing exists, or other error: ${e}"}
+      echo ("Project testing exists, or other error: ${e}")
     }
     createProject('testing')
     createApp('templates/httpd-test.json', 'testing')
@@ -44,11 +44,6 @@ stage('approval') {
 
 node('maven') {
   stage ('Production') {
-    try {
-      openshift.newProject('testing')
-    } catch (e) {
-      echo ("Project testing exists, or other error: ${e}"}
-    }
     createProject('production')
     createApp('templates/httpd-test.json', 'production')
     openshiftTag(namespace: 'testing', sourceStream: 'httpd-example', sourceTag: 'latest', destinationNamespace: 'production', destinationStream: 'httpd-example', destinationTag: 'latest')
