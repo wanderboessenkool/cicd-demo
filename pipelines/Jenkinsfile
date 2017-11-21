@@ -2,7 +2,7 @@ def createProject(project) {
   try {
     openshift.newProject(project)
   } catch (e) {
-    echo ("Project ${project} exists, or other error: ${e}"}
+    echo ("Project ${project} exists, or other error: ${e}")
     echo ("Soldiering on anyway")
   }
 }
