@@ -35,7 +35,7 @@ node('maven') {
     }
     createProject('testing')
     createApp('https://raw.githubusercontent.com/wanderboessenkool/cicd-demo/master/templates/httpd-test.json', 'testing')
-    openshiftTag(namespace: openshift.project(), sourceStream: 'httpd-example', sourceTag: 'latest', destinationNamespace: 'testing', destinationStream: 'httpd-example', destinationTag: 'latest')
+    openshiftTag(namespace: 'cicd-demo', sourceStream: 'httpd-example', sourceTag: 'latest', destinationNamespace: 'testing', destinationStream: 'httpd-example', destinationTag: 'latest')
     openshiftDeploy(deploymentConfig: 'httpd-example', namespace: 'testing')
   }
 }
