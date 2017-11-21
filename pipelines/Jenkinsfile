@@ -7,9 +7,9 @@ def createProject(project) {
   }
 }
 
-def createApp(app-template, project) {
+def createApp(appTemplate, project) {
   try { 
-    openshift.newApp(app-template, namespace=project)
+    openshift.newApp(appTemplate, namespace=project)
   } catch (e) {
     echo("Error, assuming app exists, using existing app")
     echo("Error was: ${e}")
