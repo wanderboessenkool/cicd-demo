@@ -19,7 +19,7 @@ def createApp(appTemplate, project) {
 
 node('maven') {
   stage ('build') {
-    createApp('templates/httpd-dev.json', openshift.project())
+    createApp('templates/httpd-dev.json', 'cicd-demo')
     openshiftBuild(buildConfig: 'httpd-example', showBuildLogs: 'true')
   }
   stage ('deploy') {
