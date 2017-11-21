@@ -84,7 +84,7 @@
                     ],
                     "from": {
                         "kind": "ImageStreamTag",
-                        "namespace": "development",
+                        "namespace": "${NAMESPACE}",
                         "name": "httpd-example:latest"
                     }
                 }
