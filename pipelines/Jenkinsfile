@@ -86,7 +86,7 @@ pipeline {
     stage('Build in cicd-demo') {
       when {
         expression {
-          openshift.withCLuster() {
+          openshift.withCluster() {
             return !openshift.selector('project/cicd-demo').exists();
           }
         }
