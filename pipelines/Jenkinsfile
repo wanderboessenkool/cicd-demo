@@ -68,7 +68,7 @@ pipeline {
         expression {
           openshift.withCluster() {
             openshift.withProject('cicd-demo') {
-              return !openshift.selector('bc/httpd-example').exists;
+              return !openshift.selector('bc/httpd-example').exists();
             }
           }
         }
@@ -87,7 +87,7 @@ pipeline {
       when {
         expression {
           openshift.withCLuster() {
-            return !openshift.selector('project/cicd-demo').exists;
+            return !openshift.selector('project/cicd-demo').exists();
           }
         }
       }
@@ -106,7 +106,7 @@ pipeline {
         expression {
           openshift.withCluster() {
             openshift.withProject('cicd-demo') {
-              return !openshift.selector('dc/httpd-example').exists;
+              return !openshift.selector('dc/httpd-example').exists();
             }
           }
         }
@@ -127,7 +127,7 @@ pipeline {
         expression {
           openshift.withCluster() {
             openshift.withProject('testing') {
-              return !openshift.selector('dc/httpd-example').exists;
+              return !openshift.selector('dc/httpd-example').exists();
             }
           }
         }
@@ -158,7 +158,7 @@ pipeline {
         expression {
           openshift.withCluster() {
             openshift.withProject('testing') {
-              return !openshift.selector('dc/httpd-example').exists;
+              return !openshift.selector('dc/httpd-example').exists();
             }
           }
         }
@@ -188,7 +188,7 @@ pipeline {
         expression {
           openshift.withCluster() {
             openshift.withProject('production') {
-              return !openshift.selector('dc/httpd-example').exists;
+              return !openshift.selector('dc/httpd-example').exists();
             }
           }
         }
@@ -219,7 +219,7 @@ pipeline {
         expression {
           openshift.withCluster() {
             openshift.withProject('prodcution') {
-              return !openshift.selector('dc/httpd-example').exists;
+              return !openshift.selector('dc/httpd-example').exists();
             }
           }
         }
