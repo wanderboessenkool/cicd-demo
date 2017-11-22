@@ -84,13 +84,6 @@ pipeline {
       }
     }
     stage('Build in cicd-demo') {
-      when {
-        expression {
-          openshift.withCluster() {
-            return !openshift.selector('project/cicd-demo').exists();
-          }
-        }
-      }
       steps {
         script {
           openshift.withCluster() {
@@ -102,15 +95,6 @@ pipeline {
       }
     }
     stage('Deploy in cicd-demo') {
-      when {
-        expression {
-          openshift.withCluster() {
-            openshift.withProject('cicd-demo') {
-              return !openshift.selector('dc/httpd-example').exists();
-            }
-          }
-        }
-      }
       steps {
         script {
           openshift.withCluster() {
@@ -154,15 +138,6 @@ pipeline {
       }
     }
     stage('Deploy in testing') {
-      when {
-        expression {
-          openshift.withCluster() {
-            openshift.withProject('testing') {
-              return !openshift.selector('dc/httpd-example').exists();
-            }
-          }
-        }
-      }
       steps {
         script {
           openshift.withCluster() {
@@ -184,15 +159,6 @@ pipeline {
       }
     }
     stage('Ensure DeploymentConfig exists in production') {
-      when {
-        expression {
-          openshift.withCluster() {
-            openshift.withProject('production') {
-              return !openshift.selector('dc/httpd-example').exists();
-            }
-          }
-        }
-      }
       steps {
         script {
           openshift.withCluster() {
@@ -215,15 +181,6 @@ pipeline {
       }
     }
     stage('Deploy in production') {
-      when {
-        expression {
-          openshift.withCluster() {
-            openshift.withProject('prodcution') {
-              return !openshift.selector('dc/httpd-example').exists();
-            }
-          }
-        }
-      }
       steps {
         script {
           openshift.withCluster() {
