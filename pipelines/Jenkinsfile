@@ -1,57 +1,311 @@
-def createProject(project) {
-  openshift.withCluster() {
-    echo("Attempting to create project on cluster: ${openshift.cluster()}")
-    try {
-      openshift.newProject(project, "--display-name", project)
-    } catch (e) {
-      echo ("Project ${project} exists, or other error: ${e}")
-      echo ("Soldiering on anyway")
+def devTemplate = 'https://raw.githubusercontent.com/wanderboessenkool/cicd-demo/master/templates/httpd-dev.json'
+def testTemplate = 'https://raw.githubusercontent.com/wanderboessenkool/cicd-demo/master/templates/httpd-test.json'
+
+
+//def createProject(project) {
+//  openshift.withCluster() {
+//    echo("Attempting to create project on cluster: ${openshift.cluster()}")
+//    try {
+//      openshift.newProject(project, "--display-name", project)
+//    } catch (e) {
+//      echo ("Project ${project} exists, or other error: ${e}")
+//      echo ("Soldiering on anyway")
+//    }
+//  }
+//}
+//
+//def createApp(appTemplate, project) {
+//  try {
+//    openshift.withProject(project) {
+//      openshift.create(openshift.process(appTemplate, "-p NAMESPACE=${project}"))
+//    }
+//  } catch (e) {
+//    echo("Error, assuming app exists, using existing app")
+//    echo("Error was: ${e}")
+//    echo("Continuing anyway")
+//  }
+//}
+//
+//node('maven') {
+//  stage ('build') {
+//    createApp('https://raw.githubusercontent.com/wanderboessenkool/cicd-demo/master/templates/httpd-dev.json', 'cicd-demo')
+//    openshiftBuild(buildConfig: 'httpd-example', showBuildLogs: 'true')
+//  }
+//  stage ('deploy') {
+//    openshiftDeploy(deploymentConfig: 'httpd-example')
+//  }
+//  stage('test') {
+//    try {
+//      openshift.newProject('testing')
+//    } catch (e) {
+//      echo ("Project testing exists, or other error: ${e}")
+//    }
+//    createProject('testing')
+//    createApp('https://raw.githubusercontent.com/wanderboessenkool/cicd-demo/master/templates/httpd-test.json', 'testing')
+//    openshiftTag(namespace: 'cicd-demo', sourceStream: 'httpd-example', sourceTag: 'latest', destinationNamespace: 'testing', destinationStream: 'httpd-example', destinationTag: 'latest')
+//    openshiftDeploy(deploymentConfig: 'httpd-example', namespace: 'testing')
+//  }
+//}
+//
+//stage('approval') {
+//  input('Proceed with deploy to production?')
+//}
+//
+//node('maven') {
+//  stage ('Production') {
+//    createProject('production')
+//    createApp('https://raw.githubusercontent.com/wanderboessenkool/cicd-demo/master/templates/httpd-test.json', 'production')
+//    openshiftTag(namespace: 'testing', sourceStream: 'httpd-example', sourceTag: 'latest', destinationNamespace: 'production', destinationStream: 'httpd-example', destinationTag: 'latest')
+//    openshiftDeploy(deploymentConfig: 'httpd-example', namespace: 'production')
+//  }
+//}
+
+pipeline {
+  agent any
+  stages {
+    stage('Ensure BuildConfig exists in cicd-demo') {
+      when {
+        expression {
+          openshift.withCluster() {
+            openshift.withProject('cicd-demo') {
+              return !openshift.selector('bc/httpd-example').exists;
+            }
+          }
+        }
+      }
+      steps {
+        script {
+          openshift.withCluster() {
+            openshift.withProject('cicd-demo') {
+              openshift.create(openshift.process(devTemplate, "-p NAMESPACE=${openshift.project()}"))
+            }
+          }
+        }
+      }
     }
-  }
-}
-
-def createApp(appTemplate, project) {
-  try {
-    openshift.withProject(project) {
-      openshift.create(openshift.process(appTemplate, "-p NAMESPACE=${project}"))
+    stage('Build in cicd-demo') {
+      when {
+        expression {
+          openshift.withCLuster() {
+            return !openshift.selector('project/cicd-demo').exists;
+          }
+        }
+      }
+      steps {
+        script {
+          openshift.withCluster() {
+            openshift.withProject('cicd-demo') {
+              openshift.selector('bc/httpd-example').startBuild("--wait", "-F")
+            }
+          }
+        }
+      }
     }
-  } catch (e) {
-    echo("Error, assuming app exists, using existing app")
-    echo("Error was: ${e}")
-    echo("Continuing anyway")
-  }
-}
-
-node('maven') {
-  stage ('build') {
-    createApp('https://raw.githubusercontent.com/wanderboessenkool/cicd-demo/master/templates/httpd-dev.json', 'cicd-demo')
-    openshiftBuild(buildConfig: 'httpd-example', showBuildLogs: 'true')
-  }
-  stage ('deploy') {
-    openshiftDeploy(deploymentConfig: 'httpd-example')
-  }
-  stage('test') {
-    try {
-      openshift.newProject('testing')
-    } catch (e) {
-      echo ("Project testing exists, or other error: ${e}")
+    stage('Deploy in cicd-demo') {
+      when {
+        expression {
+          openshift.withCluster() {
+            openshift.withProject('cicd-demo') {
+              return !openshift.selector('dc/httpd-example').exists;
+            }
+          }
+        }
+      }
+      steps {
+        script {
+          openshift.withCluster() {
+            openshift.withProject('cicd-demo') {
+              newDeploy = openshift.selector('dc/httpd-example').rollout()
+              newDeploy.latest()
+            }
+          }
+        }
+      }
     }
-    createProject('testing')
-    createApp('https://raw.githubusercontent.com/wanderboessenkool/cicd-demo/master/templates/httpd-test.json', 'testing')
-    openshiftTag(namespace: 'cicd-demo', sourceStream: 'httpd-example', sourceTag: 'latest', destinationNamespace: 'testing', destinationStream: 'httpd-example', destinationTag: 'latest')
-    openshiftDeploy(deploymentConfig: 'httpd-example', namespace: 'testing')
-  }
-}
+    stage('Ensure DeploymentConfig exists in testing') {
+      when {
+        expression {
+          openshift.withCluster() {
+            openshift.withProject('testing') {
+              return !openshift.selector('dc/httpd-example').exists;
+            }
+          }
+        }
+      }
+      steps {
+        script {
+          openshift.withCluster() {
+            openshift.withProject('cicd-demo') {
+              openshift.create(openshift.process(testTemplate, "-p NAMESPACE=${openshift.project()}"))
+            }
+          }
+        }
+      }
+    }
+    stage('Tag image from cicd-demo to testing') {
+      steps {
+        script {
+          openshift.withCluster() {
+            openshift.withProject('cicd-demo') {
+              openshift.tag("cicd-demo/httpd-example:latest", "testing/httpd-example:latest")
+            }
+          }
+        }
+      }
+    }
+    stage('Deploy in testing') {
+      when {
+        expression {
+          openshift.withCluster() {
+            openshift.withProject('testing') {
+              return !openshift.selector('dc/httpd-example').exists;
+            }
+          }
+        }
+      }
+      steps {
+        script {
+          openshift.withCluster() {
+            openshift.withProject('testing') {
+              newDeploy = openshift.selector('dc/httpd-example').rollout()
+              newDeploy.latest()
+            }
+          }
+        }
+      }
+    }
+    stage('Ask for approval') {
+      steps {
+        script {
+          openshift.withCluster() {
+            input("Deploy to Production?")
+          }
+        }
+      }
+    }
+    stage('Ensure DeploymentConfig exists in production') {
+      when {
+        expression {
+          openshift.withCluster() {
+            openshift.withProject('production') {
+              return !openshift.selector('dc/httpd-example').exists;
+            }
+          }
+        }
+      }
+      steps {
+        script {
+          openshift.withCluster() {
+            openshift.withProject('production') {
+              openshift.create(openshift.process(testTemplate, "-p NAMESPACE=${openshift.project()}"))
+            }
+          }
+        }
+      }
+    }
+    stage('Tag image from testing to production') {
+      steps {
+        script {
+          openshift.withCluster() {
+            openshift.withProject('testing') {
+              openshift.tag("testing/httpd-example:latest", "production/httpd-example:latest")
+            }
+          }
+        }
+      }
+    }
+    stage('Deploy in production') {
+      when {
+        expression {
+          openshift.withCluster() {
+            openshift.withProject('prodcution') {
+              return !openshift.selector('dc/httpd-example').exists;
+            }
+          }
+        }
+      }
+      steps {
+        script {
+          openshift.withCluster() {
+            openshift.withProject('production') {
+              newDeploy = openshift.selector('dc/httpd-example').rollout()
+              newDeploy.latest()
+            }
+          }
+        }
+      }
+    }
+    stage('NAME') {
+      when {
+        expression {
+          openshift.withCLuster() {
+            return !openshift.selector('project/cicd-demo').exists;
+          }
+        }
+      }
+      steps {
+        script {
+          openshift.withCluster() {
+            openshift.withProject('cicd-demo') {
 
-stage('approval') {
-  input('Proceed with deploy to production?')
-}
+            }
+          }
+        }
+      }
+    }
+    stage('NAME') {
+      when {
+        expression {
+          openshift.withCLuster() {
+            return !openshift.selector('project/cicd-demo').exists;
+          }
+        }
+      }
+      steps {
+        script {
+          openshift.withCluster() {
+            openshift.withProject('cicd-demo') {
 
-node('maven') {
-  stage ('Production') {
-    createProject('production')
-    createApp('https://raw.githubusercontent.com/wanderboessenkool/cicd-demo/master/templates/httpd-test.json', 'production')
-    openshiftTag(namespace: 'testing', sourceStream: 'httpd-example', sourceTag: 'latest', destinationNamespace: 'production', destinationStream: 'httpd-example', destinationTag: 'latest')
-    openshiftDeploy(deploymentConfig: 'httpd-example', namespace: 'production')
+            }
+          }
+        }
+      }
+    }
+    stage('NAME') {
+      when {
+        expression {
+          openshift.withCLuster() {
+            return !openshift.selector('project/cicd-demo').exists;
+          }
+        }
+      }
+      steps {
+        script {
+          openshift.withCluster() {
+            openshift.withProject('cicd-demo') {
+
+            }
+          }
+        }
+      }
+    }
+    stage('NAME') {
+      when {
+        expression {
+          openshift.withCLuster() {
+            return !openshift.selector('project/cicd-demo').exists;
+          }
+        }
+      }
+      steps {
+        script {
+          openshift.withCluster() {
+            openshift.withProject('cicd-demo') {
+
+            }
+          }
+        }
+      }
+    }
   }
 }
