@@ -119,7 +119,7 @@ pipeline {
       steps {
         script {
           openshift.withCluster() {
-            openshift.withProject('cicd-demo') {
+            openshift.withProject('testing') {
               openshift.create(openshift.process(testTemplate, "-p NAMESPACE=${openshift.project()}"))
             }
           }
@@ -159,6 +159,15 @@ pipeline {
       }
     }
     stage('Ensure DeploymentConfig exists in production') {
+      when {
+        expression {
+          openshift.withCluster() {
+            openshift.withProject('production') {
+              return !openshift.selector('dc/httpd-example').exists();
+            }
+          }
+        }
+      }
       steps {
         script {
           openshift.withCluster() {
