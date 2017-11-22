@@ -2,64 +2,6 @@ def devTemplate = 'https://raw.githubusercontent.com/wanderboessenkool/cicd-demo
 def testTemplate = 'https://raw.githubusercontent.com/wanderboessenkool/cicd-demo/master/templates/httpd-test.json'
 
 
-//def createProject(project) {
-//  openshift.withCluster() {
-//    echo("Attempting to create project on cluster: ${openshift.cluster()}")
-//    try {
-//      openshift.newProject(project, "--display-name", project)
-//    } catch (e) {
-//      echo ("Project ${project} exists, or other error: ${e}")
-//      echo ("Soldiering on anyway")
-//    }
-//  }
-//}
-//
-//def createApp(appTemplate, project) {
-//  try {
-//    openshift.withProject(project) {
-//      openshift.create(openshift.process(appTemplate, "-p NAMESPACE=${project}"))
-//    }
-//  } catch (e) {
-//    echo("Error, assuming app exists, using existing app")
-//    echo("Error was: ${e}")
-//    echo("Continuing anyway")
-//  }
-//}
-//
-//node('maven') {
-//  stage ('build') {
-//    createApp('https://raw.githubusercontent.com/wanderboessenkool/cicd-demo/master/templates/httpd-dev.json', 'cicd-demo')
-//    openshiftBuild(buildConfig: 'httpd-example', showBuildLogs: 'true')
-//  }
-//  stage ('deploy') {
-//    openshiftDeploy(deploymentConfig: 'httpd-example')
-//  }
-//  stage('test') {
-//    try {
-//      openshift.newProject('testing')
-//    } catch (e) {
-//      echo ("Project testing exists, or other error: ${e}")
-//    }
-//    createProject('testing')
-//    createApp('https://raw.githubusercontent.com/wanderboessenkool/cicd-demo/master/templates/httpd-test.json', 'testing')
-//    openshiftTag(namespace: 'cicd-demo', sourceStream: 'httpd-example', sourceTag: 'latest', destinationNamespace: 'testing', destinationStream: 'httpd-example', destinationTag: 'latest')
-//    openshiftDeploy(deploymentConfig: 'httpd-example', namespace: 'testing')
-//  }
-//}
-//
-//stage('approval') {
-//  input('Proceed with deploy to production?')
-//}
-//
-//node('maven') {
-//  stage ('Production') {
-//    createProject('production')
-//    createApp('https://raw.githubusercontent.com/wanderboessenkool/cicd-demo/master/templates/httpd-test.json', 'production')
-//    openshiftTag(namespace: 'testing', sourceStream: 'httpd-example', sourceTag: 'latest', destinationNamespace: 'production', destinationStream: 'httpd-example', destinationTag: 'latest')
-//    openshiftDeploy(deploymentConfig: 'httpd-example', namespace: 'production')
-//  }
-//}
-
 pipeline {
   agent any
   stages {
