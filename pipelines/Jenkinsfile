@@ -30,6 +30,8 @@ pipeline {
         script {
           openshift.withCluster() {
             openshift.withProject('cicd-demo') {
+              openshift.verbose()
+              echo(sh("env"))
               myBuild = openshift.selector('bc/httpd-example').startBuild()
               myBuild.logs()
             }
