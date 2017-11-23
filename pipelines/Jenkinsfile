@@ -76,7 +76,8 @@ pipeline {
         script {
           openshift.withCluster() {
             openshift.withProject('cicd-demo') {
-              openshift.tag("cicd-demo/httpd-example:latest", "testing/httpd-example:latest")
+              openshift.tag("cicd-demo/httpd-example:latest", "testing/httpd-example:${BUILD_ID}")
+              openshift.tag("testing/httpd-example:${BUILD_ID}", "testing/httpd-example:latest")
             }
           }
         }
@@ -128,7 +129,8 @@ pipeline {
         script {
           openshift.withCluster() {
             openshift.withProject('testing') {
-              openshift.tag("testing/httpd-example:latest", "production/httpd-example:latest")
+              openshift.tag("testing/httpd-example:latest", "production/httpd-example:${BUILD_ID}")
+              openshift.tag("production/httpd-example:${BUILD_ID}", "production/httpd-example:latest")
             }
           }
         }
