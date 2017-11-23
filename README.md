@@ -10,6 +10,3 @@ oc policy add-role-to-user edit system:serviceaccount:cicd-demo:jenkins -n testi
 oc policy add-role-to-user edit system:serviceaccount:cicd-demo:jenkins -n production
 oc create pipelines/development-pipeline.yaml -n cicd-demo
 ```
-
-Optionally, you can skip creating the projects and granting jenkins permissions
-on those projects by granting jenkins permission to create new projects.
