@@ -85,7 +85,7 @@
             "from": {
               "kind": "ImageStreamTag",
               "namespace": "${NAMESPACE}",
-              "name": "httpd:latest"
+              "name": "httpd-example:latest"
             },
             "env":  [
               {
